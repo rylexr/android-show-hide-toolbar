@@ -1,0 +1,31 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    jcenter()
+}
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion '22.0.1'
+
+    defaultConfig {
+        applicationId 'com.tinbytes.samples.showhidetoolbar'
+        minSdkVersion 14 // ICS
+        targetSdkVersion 22 // LP
+        versionCode 1
+        versionName '1.0.0'
+    }
+}
+
+ext {
+    appCompatV7 = '22.1.+'
+    recyclerViewV7 = '21.0.+'
+}
+
+dependencies {
+    // AppCompat
+    compile "com.android.support:appcompat-v7:$appCompatV7"
+    // RecyclerView
+    compile "com.android.support:recyclerview-v7:$recyclerViewV7"
+}
+

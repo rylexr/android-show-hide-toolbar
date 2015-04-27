@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 5 - Material Design -->
+    <color name="app_primary">#03A9F4</color>
+    <color name="app_primary_dark">#0091EA</color>
+    <color name="app_accent">#00B0FF</color>
+</resources>

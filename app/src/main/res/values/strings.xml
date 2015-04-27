@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Show/Hide Toolbar Sample</string>
+    <string name="action_about">About</string>
+    <string name="about">About</string>
+    <string name="about_body">
+        <![CDATA[
+            <b>Show/Hide Toolbar Sample</b><br/>
+            Version %s<br/>
+            Developed by Randy Saborio<br/><br/>
+            <a href="https://github.com/rylexr">Github</a><br/><br/>
+            <a href="https://rylexr.wordpress.com">Blog</a>
+        ]]>
+    </string>
+</resources>
