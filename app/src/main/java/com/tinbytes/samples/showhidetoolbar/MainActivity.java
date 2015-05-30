@@ -40,10 +40,23 @@ import com.tinbytes.samples.showhidetoolbar.util.HelpUtils;
 public class MainActivity extends AppCompatActivity {
   // The elevation of the toolbar when content is scrolled behind
   private static final float TOOLBAR_ELEVATION = 14f;
+  // To save/restore recyclerview state on configuration changes
+  private static final String STATE_RECYCLER_VIEW = "state-recycler-view";
+  private static final String STATE_VERTICAL_OFFSET = "state-vertical-offset";
+  private static final String STATE_SCROLLING_UP = "state-scrolling-up";
+  private static final String STATE_TOOLBAR_ELEVATION = "state-toolbar-elevation";
+  private static final String STATE_TOOLBAR_TRANSLATION_Y = "state-toolbar-translation-y";
 
   // We need a reference to the toolbar for hide/show animation
   private Toolbar tToolbar;
+  // We need a reference to the recyclerview to save/restore its state
+  private RecyclerView rvCities;
+  // Keeps track of the overall vertical offset in the list
+  private int verticalOffset;
+  // Determines the scroll UP/DOWN direction
+  private boolean scrollingUp;
 
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -55,19 +68,22 @@ public class MainActivity extends AppCompatActivity {
     getSupportActionBar().setTitle(R.string.app_name);
 
     // RecyclerView with sample data
-    RecyclerView rvCities = (RecyclerView) findViewById(R.id.rvCities);
+    rvCities = (RecyclerView) findViewById(R.id.rvCities);
     rvCities.setLayoutManager(new LinearLayoutManager(this));
     rvCities.setAdapter(new CitiesAdapter(CityUtils.CITIES));
 
+    if (savedInstanceState != null) {
+      if (AndroidUtils.isLollipop()) {
+        tToolbar.setElevation(savedInstanceState.getFloat(STATE_TOOLBAR_ELEVATION));
+      }
+      tToolbar.setTranslationY(savedInstanceState.getFloat(STATE_TOOLBAR_TRANSLATION_Y));
+      verticalOffset = savedInstanceState.getInt(STATE_VERTICAL_OFFSET);
+      scrollingUp = savedInstanceState.getBoolean(STATE_SCROLLING_UP);
+      rvCities.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(STATE_RECYCLER_VIEW));
+    }
+
     // We need to detect scrolling changes in the RecyclerView
     rvCities.setOnScrollListener(new RecyclerView.OnScrollListener() {
-
-      // Keeps track of the overall vertical offset in the list
-      int verticalOffset;
-
-      // Determines the scroll UP/DOWN direction
-      boolean scrollingUp;
-
       @Override
       public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
@@ -118,6 +134,19 @@ public class MainActivity extends AppCompatActivity {
         }
       }
     });
+  }
+
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    if (AndroidUtils.isLollipop()) {
+      outState.putFloat(STATE_TOOLBAR_ELEVATION, tToolbar.getElevation());
+    }
+    outState.putFloat(STATE_TOOLBAR_TRANSLATION_Y, tToolbar.getTranslationY());
+    outState.putInt(STATE_VERTICAL_OFFSET, verticalOffset);
+    outState.putBoolean(STATE_SCROLLING_UP, scrollingUp);
+    outState.putParcelable(STATE_RECYCLER_VIEW, rvCities.getLayoutManager().onSaveInstanceState());
+    super.onSaveInstanceState(outState);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
