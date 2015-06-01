@@ -18,8 +18,8 @@ android {
 }
 
 ext {
-    appCompatV7 = '22.1.+'
-    recyclerViewV7 = '21.0.+'
+    appCompatV7 = '22.2.+'
+    recyclerViewV7 = '22.2.+'
 }
 
 dependencies {

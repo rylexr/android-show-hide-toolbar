@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
   // To save/restore recyclerview state on configuration changes
   private static final String STATE_RECYCLER_VIEW = "state-recycler-view";
   private static final String STATE_VERTICAL_OFFSET = "state-vertical-offset";
-  private static final String STATE_SCROLLING_UP = "state-scrolling-up";
+  private static final String STATE_SCROLLING_OFFSET = "state-scrolling-direction";
   private static final String STATE_TOOLBAR_ELEVATION = "state-toolbar-elevation";
   private static final String STATE_TOOLBAR_TRANSLATION_Y = "state-toolbar-translation-y";
 
@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
   private RecyclerView rvCities;
   // Keeps track of the overall vertical offset in the list
   private int verticalOffset;
-  // Determines the scroll UP/DOWN direction
-  private boolean scrollingUp;
+  // Determines the scroll UP/DOWN offset
+  private int scrollingOffset;
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   @Override
@@ -78,22 +78,22 @@ public class MainActivity extends AppCompatActivity {
       }
       tToolbar.setTranslationY(savedInstanceState.getFloat(STATE_TOOLBAR_TRANSLATION_Y));
       verticalOffset = savedInstanceState.getInt(STATE_VERTICAL_OFFSET);
-      scrollingUp = savedInstanceState.getBoolean(STATE_SCROLLING_UP);
+      scrollingOffset = savedInstanceState.getInt(STATE_SCROLLING_OFFSET);
       rvCities.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(STATE_RECYCLER_VIEW));
     }
 
     // We need to detect scrolling changes in the RecyclerView
-    rvCities.setOnScrollListener(new RecyclerView.OnScrollListener() {
+    rvCities.addOnScrollListener(new RecyclerView.OnScrollListener() {
       @Override
       public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-          if (scrollingUp) {
+          if (scrollingOffset > 0) {
             if (verticalOffset > tToolbar.getHeight()) {
               toolbarAnimateHide();
             } else {
               toolbarAnimateShow(verticalOffset);
             }
-          } else {
+          } else if (scrollingOffset < 0) {
             if (tToolbar.getTranslationY() < tToolbar.getHeight() * -0.6 && verticalOffset > tToolbar.getHeight()) {
               toolbarAnimateHide();
             } else {
@@ -105,11 +105,11 @@ public class MainActivity extends AppCompatActivity {
 
       @Override
       public final void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-        verticalOffset += dy;
-        scrollingUp = dy > 0;
+        verticalOffset = rvCities.computeVerticalScrollOffset();
+        scrollingOffset = dy;
         int toolbarYOffset = (int) (dy - tToolbar.getTranslationY());
         tToolbar.animate().cancel();
-        if (scrollingUp) {
+        if (scrollingOffset > 0) {
           if (toolbarYOffset < tToolbar.getHeight()) {
             if (verticalOffset > tToolbar.getHeight()) {
               toolbarSetElevation(TOOLBAR_ELEVATION);
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             toolbarSetElevation(0);
             tToolbar.setTranslationY(-tToolbar.getHeight());
           }
-        } else {
+        } else if (scrollingOffset < 0) {
           if (toolbarYOffset < 0) {
             if (verticalOffset <= 0) {
               toolbarSetElevation(0);
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
     }
     outState.putFloat(STATE_TOOLBAR_TRANSLATION_Y, tToolbar.getTranslationY());
     outState.putInt(STATE_VERTICAL_OFFSET, verticalOffset);
-    outState.putBoolean(STATE_SCROLLING_UP, scrollingUp);
+    outState.putInt(STATE_SCROLLING_OFFSET, scrollingOffset);
     outState.putParcelable(STATE_RECYCLER_VIEW, rvCities.getLayoutManager().onSaveInstanceState());
     super.onSaveInstanceState(outState);
   }
