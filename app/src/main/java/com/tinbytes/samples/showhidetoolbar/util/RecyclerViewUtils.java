@@ -84,13 +84,13 @@ public final class RecyclerViewUtils {
     @Override
     public final void onScrollStateChanged(RecyclerView recyclerView, int newState) {
       if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-        if (state.scrollingOfsset > 0) {
+        if (state.scrollingOffset > 0) {
           if (state.verticalOffset > toolbar.getHeight()) {
             toolbarAnimateHide();
           } else {
             toolbarAnimateShow(state.verticalOffset);
           }
-        } else if (state.scrollingOfsset < 0) {
+        } else if (state.scrollingOffset < 0) {
           if (toolbar.getTranslationY() < toolbar.getHeight() * -0.6 && state.verticalOffset > toolbar.getHeight()) {
             toolbarAnimateHide();
           } else {
@@ -103,10 +103,10 @@ public final class RecyclerViewUtils {
     @Override
     public final void onScrolled(RecyclerView recyclerView, int dx, int dy) {
       state.verticalOffset = recyclerView.computeVerticalScrollOffset();
-      state.scrollingOfsset = dy;
+      state.scrollingOffset = dy;
       int toolbarYOffset = (int) (dy - toolbar.getTranslationY());
       toolbar.animate().cancel();
-      if (state.scrollingOfsset > 0) {
+      if (state.scrollingOffset > 0) {
         if (toolbarYOffset < toolbar.getHeight()) {
           if (state.verticalOffset > toolbar.getHeight()) {
             toolbarSetElevation(TOOLBAR_ELEVATION);
@@ -116,7 +116,7 @@ public final class RecyclerViewUtils {
           toolbarSetElevation(0);
           toolbar.setTranslationY(state.translationY = -toolbar.getHeight());
         }
-      } else if (state.scrollingOfsset < 0) {
+      } else if (state.scrollingOffset < 0) {
         if (toolbarYOffset < 0) {
           if (state.verticalOffset <= 0) {
             toolbarSetElevation(0);
@@ -134,7 +134,7 @@ public final class RecyclerViewUtils {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void onRestoreInstanceState(State state) {
       this.state.verticalOffset = state.verticalOffset;
-      this.state.scrollingOfsset = state.scrollingOfsset;
+      this.state.scrollingOffset = state.scrollingOffset;
       if (AndroidUtils.isLollipop()) {
         toolbar.setElevation(state.elevation);
         toolbar.setTranslationY(state.translationY);
@@ -167,7 +167,7 @@ public final class RecyclerViewUtils {
       // Keeps track of the overall vertical offset in the list
       private int verticalOffset;
       // Determines the scroll UP/DOWN offset
-      private int scrollingOfsset;
+      private int scrollingOffset;
       // Toolbar values
       private float translationY;
       private float elevation;
@@ -177,7 +177,7 @@ public final class RecyclerViewUtils {
 
       State(Parcel parcel) {
         this.verticalOffset = parcel.readInt();
-        this.scrollingOfsset = parcel.readInt();
+        this.scrollingOffset = parcel.readInt();
         this.translationY = parcel.readFloat();
         this.elevation = parcel.readFloat();
       }
@@ -190,7 +190,7 @@ public final class RecyclerViewUtils {
       @Override
       public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(verticalOffset);
-        parcel.writeInt(scrollingOfsset);
+        parcel.writeInt(scrollingOffset);
         parcel.writeFloat(translationY);
         parcel.writeFloat(elevation);
       }
